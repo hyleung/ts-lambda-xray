@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "array-type": [true, "array"],
+    "interface-name": false,
+    "interface-over-type-literal": false,
+    "no-implicit-dependencies": false,
+    "object-literal-sort-keys": false,
+    "only-arrow-functions": false,
+    "variable-name": [true, "check-format", "allow-leading-underscore"]
+  },
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "linterOptions": {
+    "exclude": ["codegen/**/*.ts", "test/scripts/loadtest/*.js"]
+  }
+}

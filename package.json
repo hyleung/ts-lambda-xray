@@ -1,0 +1,32 @@
+{
+  "name": "@hyleung/ts-lambda-xray",
+  "version": "0.0.1",
+  "description": "",
+  "main": "tslint.json",
+  "author": "Unbounce",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "aws-sdk": "^2.386.0",
+    "pino": "^5.11.1"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "start": "ts-node",
+    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "prettier": "prettier --list-different --parser typescript src/**/*.{ts,js,tsx} test/**/*.{ts,js,tsx}",
+    "test": "npm run prettier && npm run lint && jest"
+  },
+  "homepage": "https://github.com/hyleung/ts-lambda-xray",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.17",
+    "@types/jest": "^23.3.12",
+    "@types/node": "^10.12.18",
+    "@types/pino": "^5.8.4",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.12.0",
+    "tslint-config-prettier": "^1.17.0",
+    "typescript": "^3.2.2"
+  }
+}
