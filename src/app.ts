@@ -1,4 +1,4 @@
-import { Context } from "aws-lambda";
+import { Context, KinesisStreamEvent } from "aws-lambda";
 import AWS from "aws-sdk";
 import AWSXray from "aws-xray-sdk";
 import pino from "pino";
@@ -29,4 +29,8 @@ export const handler = (event: any, context: Context) => {
         .catch(er => logger.error(er));
     })
     .catch(e => logger.error(e));
+};
+
+export const kinesisHandler = (event: KinesisStreamEvent, context: Context) => {
+  logger.info("kinesis event received", { ...event, ...context });
 };
