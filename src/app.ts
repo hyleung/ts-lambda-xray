@@ -7,6 +7,7 @@ import { ulid } from "ulid";
 const logger = pino();
 const wrapped = AWSXray.captureAWS(AWS);
 const dynamoClient = new wrapped.DynamoDB.DocumentClient();
+const kinesisClient = new wrapped.Kinesis();
 export const handler = (event: any, context: Context) => {
   logger.info("event received", { ...event, ...context });
   dynamoClient
@@ -15,6 +16,17 @@ export const handler = (event: any, context: Context) => {
       Item: { key: ulid(), payload: event }
     })
     .promise()
-    .then(r => logger.info("persisted", r))
+    .then(r => {
+      logger.info("persisted", r);
+      kinesisClient
+        .putRecord({
+          StreamName: "ts_lambda_xray",
+          PartitionKey: ulid(),
+          Data: "foo"
+        })
+        .promise()
+        .then(kr => logger.info("published", kr))
+        .catch(er => logger.error(er));
+    })
     .catch(e => logger.error(e));
 };
