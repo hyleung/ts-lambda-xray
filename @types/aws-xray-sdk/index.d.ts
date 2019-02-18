@@ -41,7 +41,12 @@ declare module "aws-xray-sdk" {
   export function captureAWSClient<T>(client: T): T;
   export function captureFunc<T>(
     name: string,
-    f: () => void,
+    fcn: () => void,
+    parent?: Segment | Subsegment
+  ): void;
+  export function captureAsyncFunc(
+    name: string,
+    fcn: (segment: Subsegment) => void,
     parent?: Segment | Subsegment
   ): void;
   export function enableAutomaticMode(): void;
