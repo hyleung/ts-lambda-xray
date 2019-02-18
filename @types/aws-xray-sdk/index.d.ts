@@ -49,6 +49,7 @@ declare module "aws-xray-sdk" {
     fcn: (segment: Subsegment) => void,
     parent?: Segment | Subsegment
   ): void;
+  export function capturePromise(): void;
   export function enableAutomaticMode(): void;
   export function enableManualMode(): void;
   export function getSegment(): Segment | Subsegment;

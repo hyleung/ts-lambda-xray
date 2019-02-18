@@ -9,26 +9,35 @@ const wrapped = AWSXray.captureAWS(AWS);
 const dynamoClient = new wrapped.DynamoDB.DocumentClient();
 const kinesisClient = new wrapped.Kinesis();
 export const handler = (event: any, context: Context) => {
-  logger.info("event received", { ...event, ...context });
-  dynamoClient
-    .put({
-      TableName: "ts-lambda-xray",
-      Item: { key: ulid(), payload: event }
-    })
-    .promise()
-    .then(r => {
-      logger.info("persisted", r);
-      kinesisClient
-        .putRecord({
-          StreamName: "ts_lambda_xray",
-          PartitionKey: ulid(),
-          Data: "foo"
-        })
-        .promise()
-        .then(kr => logger.info("published", kr))
-        .catch(er => logger.error(er));
-    })
-    .catch(e => logger.error(e));
+  AWSXray.captureAsyncFunc("handler", s => {
+    const itemId = ulid();
+    s.addAnnotation("requestId", context.awsRequestId);
+    s.addAnnotation("itemId", itemId);
+    dynamoClient
+      .put({
+        TableName: "ts-lambda-xray",
+        Item: { key: itemId, payload: event }
+      })
+      .promise()
+      .then(r => {
+        logger.info("persisted", r);
+        kinesisClient
+          .putRecord({
+            StreamName: "ts_lambda_xray",
+            PartitionKey: ulid(),
+            Data: "foo"
+          })
+          .promise()
+          .then(kr => {
+            logger.info("published", kr);
+            s.close();
+          });
+      })
+      .catch(e => {
+        logger.error(e);
+        s.close(e);
+      });
+  });
 };
 
 export const kinesisHandler = (event: KinesisStreamEvent, context: Context) => {
