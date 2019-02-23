@@ -48,6 +48,22 @@ export const handler = (event: any, context: Context) => {
   });
 };
 
+interface XRayTraceContext {
+  xray_trace_id: string;
+  xray_segment_id: string;
+}
 export const kinesisHandler = (event: KinesisStreamEvent, context: Context) => {
   logger.info("kinesis event received", { ...event, ...context });
+  for (const record of event.Records) {
+    const stringData = Buffer.from(record.kinesis.data, "base64").toString();
+    const data: XRayTraceContext = JSON.parse(stringData);
+    const seg = new AWSXray.Segment(
+      context.functionName,
+      data.xray_trace_id,
+      data.xray_segment_id
+    );
+    AWSXray.setSegment(seg);
+    logger.info("received", data);
+    AWSXray.getSegment().close();
+  }
 };

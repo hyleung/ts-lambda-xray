@@ -56,4 +56,5 @@ declare module "aws-xray-sdk" {
   export function enableAutomaticMode(): void;
   export function enableManualMode(): void;
   export function getSegment(): Segment | Subsegment;
+  export function setSegment(segment: Segment | Subsegment): void;
 }
