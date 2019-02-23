@@ -3,6 +3,7 @@ import AWS from "aws-sdk";
 import AWSXray from "aws-xray-sdk";
 import pino from "pino";
 import { ulid } from "ulid";
+import { InvocationRequest } from "aws-sdk/clients/lambda";
 
 const logger = pino();
 const wrapped = AWSXray.captureAWS(AWS);
@@ -64,6 +65,23 @@ export const kinesisHandler = (event: KinesisStreamEvent, context: Context) => {
     );
     AWSXray.setSegment(seg);
     logger.info("received", data);
-    AWSXray.getSegment().close();
+    const params: InvocationRequest = {
+      FunctionName: "ts-lambda-invoke",
+      Payload: stringData
+    };
+    const client = AWSXray.captureAWSClient(new AWS.Lambda());
+    client
+      .invoke(params)
+      .promise()
+      .then(r => {
+        logger.info("done!", r);
+        AWSXray.getSegment().close();
+      })
+      .catch(e => AWSXray.getSegment().close(e));
   }
+};
+
+// plain old handler
+export const lambdaHandler = (event: any, _context: Context) => {
+  logger.info("received", event);
 };
