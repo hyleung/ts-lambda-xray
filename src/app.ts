@@ -9,6 +9,8 @@ const wrapped = AWSXray.captureAWS(AWS);
 const dynamoClient = new wrapped.DynamoDB.DocumentClient();
 const kinesisClient = new wrapped.Kinesis();
 export const handler = (event: any, context: Context) => {
+  const traceId = AWSXray.getSegment().trace_id;
+
   AWSXray.captureAsyncFunc("handler", s => {
     const itemId = ulid();
     s.addAnnotation("requestId", context.awsRequestId);
@@ -21,11 +23,17 @@ export const handler = (event: any, context: Context) => {
       .promise()
       .then(r => {
         logger.info("persisted", r);
+        const data = {
+          message: "foo",
+          xray_trace_id: traceId,
+          xray_segment_id: s.id
+        };
+        logger.info("emitted", data);
         kinesisClient
           .putRecord({
             StreamName: "ts_lambda_xray",
             PartitionKey: ulid(),
-            Data: "foo"
+            Data: JSON.stringify(data)
           })
           .promise()
           .then(kr => {

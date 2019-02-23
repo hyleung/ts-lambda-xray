@@ -2,6 +2,9 @@ declare module "aws-xray-sdk" {
   import AWS from "aws-sdk";
   export class Segment {
     constructor(name: string, rootId?: string, parentId?: string);
+    // Getters
+    trace_id(): string;
+    id(): string;
     addAnnotation(key: string, value: boolean | number | string): void;
     addError(err: Error | string, remote?: boolean): void;
     addErrorFlag(): void;
