@@ -1,9 +1,9 @@
 import { Context, KinesisStreamEvent } from "aws-lambda";
 import AWS from "aws-sdk";
+import { InvocationRequest } from "aws-sdk/clients/lambda";
 import AWSXray from "aws-xray-sdk";
 import pino from "pino";
 import { ulid } from "ulid";
-import { InvocationRequest } from "aws-sdk/clients/lambda";
 
 const logger = pino();
 const wrapped = AWSXray.captureAWS(AWS);

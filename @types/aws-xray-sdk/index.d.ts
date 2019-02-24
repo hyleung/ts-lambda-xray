@@ -53,6 +53,8 @@ declare module "aws-xray-sdk" {
     parent?: Segment | Subsegment
   ): void;
   export function capturePromise(): void;
+  export function captureHTTPs<T>(module: T): T;
+  export function captureHTTPsGlobal(module: any): void;
   export function enableAutomaticMode(): void;
   export function enableManualMode(): void;
   export function getSegment(): Segment | Subsegment;
